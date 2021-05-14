@@ -1,11 +1,10 @@
 from io import StringIO
 import urllib.parse
 
-import pandas as pd
 import requests
 from requests.models import Response
 
-from bankfind.metadata import meta_dict
+from .metadata import meta_dict
 
 
 class BF:
@@ -34,6 +33,14 @@ class BF:
             'offset': 0,
             'format': 'json',
             'search': True
+        },
+        'financials': {
+            'sort_by': 'EFFDATE',
+            'sort_order': 'DESC',
+            'limit': 10000,
+            'offset': 0,
+            'format': 'json',
+            'search': False
         },
         'summary': {
             'sort_by': 'YEAR',
@@ -71,9 +78,9 @@ class BF:
             'offset': kwargs.get('offset', d['offset']),
             'format': 'csv' if kwargs.get('output') == 'pandas' else 'json',
             'download': 'false',
-            'fields': kwargs.get(
-                'fields', ','.join(list(meta_dict[key].keys())))
         }
+        if meta_dict[key].keys():
+            params['fields']= kwargs.get('fields', ','.join(list(meta_dict[key].keys())))
         if filters:
             params.update({'filters': filters})
         if search and d['search']:
@@ -121,6 +128,7 @@ class BF:
             search: str = None,
             **kwargs):
         params = self._construct_params(key, filters, search, **kwargs)
+        print(urllib.parse.urlencode(params))
         r = requests.get(
             f"https://banks.data.fdic.gov/api/{key}",
             params=urllib.parse.urlencode(params)

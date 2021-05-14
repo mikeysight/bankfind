@@ -30,11 +30,10 @@ def test_summary():
         filters='CB_SI:CB AND ASSET:[10000000000 TO *] AND YEAR:["2018" TO "2019"]',
         output='pandas')
     assert len(df) >= 4
-    
 
 def test_financials():
-    data = bf.get_financials(filters='CERT: 20369', limit=20)
-    assert len(data) >= 20
+    data = bf.get_financials()
+    assert len(data) >= 10000
 
 
 def test_failures():
